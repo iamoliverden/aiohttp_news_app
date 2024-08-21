@@ -10,6 +10,11 @@ Clone the repository and install the required libraries::
 
     $ git clone https://github.com/iamoliverden/aiohttp_news_app.git
 
+Create a virtual environment (in the project folder)::
+
+    $ python -m venv myenv
+    $ myenv\Scripts\activate
+
 Install the app (from the project folder)::
 
     $ pip install -e .
@@ -50,4 +55,6 @@ Usage
 
 Acknowledgment
 ==============
-This project was inspired by and includes some code from the aiohttp demos repository: `https://github.com/aio-libs/aiohttp-demos.git`
+This project was inspired by and includes some code from the aiohttp demos repository::
+
+    https://github.com/aio-libs/aiohttp-demos.git
