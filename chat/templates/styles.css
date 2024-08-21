@@ -1,0 +1,41 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0; /* Light grey background */
+}
+
+.container {
+  text-align: center;
+  width: 50%;
+  background-color: #ffffff; /* White background */
+  padding: 20px;
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+#log {
+  width: 100%;
+  height: 15em;
+  overflow: auto;
+  border: 1px solid black;
+  margin-bottom: 1em;
+  background-color: #e9e9e9; /* Light grey background for log */
+  padding: 10px;
+  border-radius: 5px; /* Rounded corners */
+}
+
+button, input[type="text"] {
+  width: 100%;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  border: 1px solid #ccc; /* Light grey border */
+  border-radius: 5px; /* Rounded corners */
+  background-color: #f9f9f9; /* Light grey background */
+}
+
+button:hover, input[type="text"]:hover {
+  background-color: #e0e0e0; /* Slightly darker grey on hover */
+}

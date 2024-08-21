@@ -1,0 +1,127 @@
+<!--index.html-->
+
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="styles.css"> <!-- Link to the CSS file -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript">
+     $(function() {
+       var conn = null;
+       var name = "UNKNOWN";
+       var newsLinks = [];
+       var pingInterval = null; // Variable to store the interval ID
+
+       function log(msg) {
+         var control = $('#log');
+         var date = new Date();
+         var date_prompt = '(' + date.toISOString().split('T')[1].slice(0,8) + ') ';
+         control.html(control.html() + date_prompt + msg + '<br/>');
+         control.scrollTop(control.scrollTop() + 1000);
+       }
+
+       function connect() {
+         disconnect();
+         var wsUri = (window.location.protocol=='https:'&&'wss://'||'ws://')+window.location.host;
+         conn = new WebSocket(wsUri);
+         conn.onopen = function() {
+           update_ui();
+           startPing();  // Start the periodic ping
+         };
+         conn.onmessage = function(e) {
+           var data = JSON.parse(e.data);
+           console.log("Received data:", data);  // Print the received data in the console
+           switch (data.action) {
+             case 'connect':
+               name = data.name;
+               log('Connected as ' + name);
+               update_ui();
+               break;
+             case 'disconnect':
+               name = data.name;
+               log('Disconnected ' + name);
+               update_ui();
+               break;
+             case 'join':
+               log('Joined ' + data.name);
+               break;
+             case 'sent':
+               if (data.name === 'Superuser') {
+                 log(data.text + ' <a href="' + data.url + '" target="_blank">link</a>');  // Exclude the superuser's name
+               } else {
+                 log(data.name + ': ' + data.text + ' <a href="' + data.url + '" target="_blank">link</a>');
+               }
+               console.log("Article URL:", data.url);  // Print the link in the console
+               newsLinks.push(data.url);
+               break;
+             case 'pong':
+               log('Connection is still active');
+               break;
+           }
+         };
+         conn.onclose = function() {
+           log('Disconnected.');
+           conn = null;
+           update_ui();
+           stopPing();  // Stop the periodic ping
+         };
+       }
+
+       function disconnect() {
+         if (conn != null) {
+           conn.close();
+           conn = null;
+           name = 'UNKNOWN';
+           update_ui();
+           stopPing();  // Stop the periodic ping
+         }
+       }
+
+       function update_ui() {
+         if (conn == null) {
+           $('#status').text('disconnected');
+           $('#connect').html('Connect');
+         } else {
+           $('#status').text('connected (' + conn.protocol + ')');
+           $('#connect').html('Disconnect');
+         }
+         $('#name').text(name);
+       }
+
+       function startPing() {
+         pingInterval = setInterval(function() {
+           if (conn && conn.readyState === WebSocket.OPEN) {
+             conn.send(JSON.stringify({ action: 'ping' }));
+           }
+         }, 30000);  // 30 seconds
+       }
+
+       function stopPing() {
+         clearInterval(pingInterval);
+       }
+
+       $('#connect').on('click', function() {
+         if (conn == null) {
+           connect();
+         } else {
+           disconnect();
+         }
+         update_ui();
+         return false;
+       });
+     });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h3>NEWS CAST WITH NEWSAPI</h3>
+      <div>
+        <button id="connect">Connect</button> | Status:
+        <span id="name">UNKNOWN</span>
+        <span id="status">disconnected</span>
+      </div>
+      <div id="log"></div>
+    </div>
+  </body>
+</html>
